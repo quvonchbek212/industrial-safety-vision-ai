@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gasmask & Head Verification — AI Video Security</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131b2e;
+      --card-border: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon { font-size: 28px; }
+    .logo-title { font-size: 18px; font-weight: 700; }
+    .badge {
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .header-links a {
+      color: #60a5fa;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 6px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 6px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      transition: all 0.2s;
+    }
+    .header-links a:hover {
+      background: rgba(59, 130, 246, 0.25);
+    }
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+    /* Upload Drop Zone */
+    .drop-zone {
+      border: 2px dashed #334155;
+      border-radius: 10px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.05);
+    }
+    .drop-icon { font-size: 40px; margin-bottom: 8px; }
+    .drop-text { font-size: 14px; color: var(--text-muted); }
+    .drop-text strong { color: var(--text-main); }
+    input[type="file"] { display: none; }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .form-control {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--accent); }
+    
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { background: #334155; cursor: not-allowed; }
+    .btn-success { background: var(--green); }
+    .btn-success:hover { background: #059669; }
+
+    /* Rules banner */
+    .rule-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .rule-banner ul { margin-left: 20px; margin-top: 6px; }
+    
+    /* Result section */
+    .result-container {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+      border: 1px solid var(--card-border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .stat-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-val { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .stat-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+    .stat-green { color: var(--green); }
+    .stat-red { color: var(--red); }
+    .stat-amber { color: var(--amber); }
+
+    /* Progress bar */
+    .progress-bar-container {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .progress-track {
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.3s;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🤿</span>
+      <span class="logo-title">Gasmask Security AI <span class="badge">Head Worn Rule</span></span>
+    </div>
+    <div class="header-links">
+      <a href="/docs" target="_blank">📄 Swagger API Docs (/docs)</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Column: Video Upload & Configuration -->
+    <div class="card">
+      <div class="card-title">📹 Video Yuklash va Sozlamalar</div>
+
+      <div class="rule-banner">
+        <strong>🧠 Aqlli Bosh & Yuz Qoidasi (Front / Side / Back AI Verification):</strong>
+        <ul>
+          <li>✅ <strong>gasmask:</strong> Gazmaska odamning yuzida/boshida bo'lsa (oldi va yon tomondan, Yashil).</li>
+          <li>🚨 <strong>no-gasmask:</strong> Odamning yuzi ko'rinsa (oldi va yon tomondan) va maska taqilmagan bo'lsa (Qizil).</li>
+          <li>👤 <strong>Orqa tomondan:</strong> Odam orqasini o'girgan bo'lsa, hechnima chiqarilmaydi (inobatga olinmaydi).</li>
+          <li>🚫 <strong>Boshqa holatlar:</strong> Maska qo'lda yoki stolda bo'lsa, model aldanmaydi (boshda deb hisoblamaydi).</li>
+        </ul>
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">🎥</div>
+        <div class="drop-text">
+          Videoni bu yerga tashlang yoki <strong>tanlash uchun bosing</strong>
+          <br><small style="color:#64748b;">(.mp4, .avi, .mov, .mkv)</small>
+        </div>
+        <input type="file" id="videoInput" accept="video/*">
+      </div>
+
+      <div id="fileInfo" style="display:none; font-family:'JetBrains Mono'; font-size:12px; color:#60a5fa;">
+        Fayl: <span id="fileName"></span> (<span id="fileSize"></span> MB)
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label>Inference o'lchami (imgsz):</label>
+          <select id="selectImgsz" class="form-control">
+            <option value="1280" selected>1280 px (Uzoqdagi odamlar uchun — Tavsiya)</option>
+            <option value="960">960 px (O'rta masofa)</option>
+            <option value="640">640 px (Faqat yaqindagi odamlar — Tezkor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ishonchlilik (Confidence):</label>
+          <select id="selectConf" class="form-control">
+            <option value="0.20">0.20 (Juda sezgir / uzoq)</option>
+            <option value="0.25" selected>0.25 (Tavsiya etilgan)</option>
+            <option value="0.35">0.35 (Qat'iy)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Kadrlar qadami (Tezlik):</label>
+        <select id="selectStride" class="form-control">
+          <option value="2" selected>2 — Har ikkinchi kadr (2x tezroq — Tavsiya)</option>
+          <option value="1">1 — Har bir kadr (Maksimal aniqlik)</option>
+          <option value="3">3 — Har uchinchi kadr (3x tezroq)</option>
+        </select>
+      </div>
+
+      <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <label style="display: flex; align-items: center; gap: 9px; font-size: 13px; cursor: pointer; color: #f8fafc;">
+          <input type="checkbox" id="checkHideBoxes" checked style="accent-color: #3b82f6; width: 17px; height: 17px; cursor: pointer;">
+          <span>✨ <strong>Qutilarni yashirish</strong> (Faqat toza yozuvlar: <em>gasmask / no-gasmask</em>)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 9px; font-size: 13px; cursor: pointer; color: #94a3b8;">
+          <input type="checkbox" id="checkShowDistance" style="accent-color: #3b82f6; width: 17px; height: 17px; cursor: pointer;">
+          <span>📏 Masofani yozuvda ko'rsatish (masalan: <em>~3.5m</em>)</span>
+        </label>
+      </div>
+
+      <button id="btnProcess" class="btn" disabled>
+        <span>⚡ Videoni tekshirishni boshlash</span>
+      </button>
+
+      <div class="progress-bar-container" id="progressContainer">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+          <span>Neyrotarmoq videoni tahlil qilmoqda...</span>
+          <span id="progressText">Iltimos kuting</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width: 100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Video Preview & Telemetry -->
+    <div class="card">
+      <div class="card-title">📊 Natijalar va Video Telemetriya</div>
+
+      <div id="emptyResultState" style="text-align:center; padding: 60px 20px; color: var(--text-muted);">
+        <div style="font-size: 48px; margin-bottom: 12px;">📈</div>
+        <div>Chap tomondan video yuklab <strong>"Tekshirishni boshlash"</strong> tugmasini bosing yoki 
+        <a href="/docs" target="_blank" style="color:#60a5fa;">Swagger UI</a> dan foydalaning.</div>
+      </div>
+
+      <div class="result-container" id="resultContainer">
+        <video id="resultVideo" controls playsinline></video>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="valTotalPersons">0</div>
+            <div class="stat-lbl">Jami Odamlar</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val stat-green" id="valWearingMask">0</div>
+            <div class="stat-lbl">✅ gasmask</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val stat-red" id="valViolations">0</div>
+            <div class="stat-lbl">🚨 no-gasmask</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; border:1px solid var(--card-border);">
+          <div style="font-size:13px;">
+            <div>Tezlik: <strong id="valSpeed">0</strong> FPS | Vaqt: <strong id="valTime">0</strong>s</div>
+            <div style="color:var(--text-muted); font-size:12px; margin-top:2px;">Model: exp-3.pt (imgsz=1280)</div>
+          </div>
+          <a id="btnDownload" class="btn btn-success" download style="text-decoration:none; padding:8px 14px; font-size:13px;">
+            📥 Videoni yuklab olish (.mp4)
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const videoInput = document.getElementById('videoInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const btnProcess = document.getElementById('btnProcess');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressText = document.getElementById('progressText');
+    const emptyResultState = document.getElementById('emptyResultState');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultVideo = document.getElementById('resultVideo');
+    const btnDownload = document.getElementById('btnDownload');
+
+    let selectedFile = null;
+
+    dropZone.addEventListener('click', () => videoInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    videoInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = (file.size / (1024 * 1024)).toFixed(1);
+      fileInfo.style.display = 'block';
+      btnProcess.disabled = false;
+    }
+
+    btnProcess.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      btnProcess.disabled = true;
+      progressContainer.style.display = 'flex';
+      progressText.textContent = "Video serverga yuklanmoqda...";
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const imgsz = document.getElementById('selectImgsz').value;
+      const conf = document.getElementById('selectConf').value;
+      const stride = document.getElementById('selectStride').value;
+      const hideBoxes = document.getElementById('checkHideBoxes').checked;
+      const showBoxes = !hideBoxes;
+      const showDistance = document.getElementById('checkShowDistance').checked;
+
+      try {
+        progressText.textContent = "AI model har bir kadrni tekshirmoqda...";
+        const url = `/api/video/analyze?imgsz=${imgsz}&conf=${conf}&frame_stride=${stride}&show_boxes=${showBoxes}&show_distance=${showDistance}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server xatosi: ${res.status}`);
+        }
+
+        const data = await res.json();
+        renderResults(data);
+
+      } catch (err) {
+        alert("Xatolik yuz berdi: " + err.message);
+      } finally {
+        btnProcess.disabled = false;
+        progressContainer.style.display = 'none';
+      }
+    });
+
+    function renderResults(data) {
+      emptyResultState.style.display = 'none';
+      resultContainer.style.display = 'flex';
+
+      const an = data.analytics || {};
+      const meta = data.video_metadata || {};
+
+      document.getElementById('valTotalPersons').textContent = an.unique_persons_tracked || 0;
+      document.getElementById('valWearingMask').textContent = an.total_safe_detections || 0;
+      document.getElementById('valViolations').textContent = an.total_violations_no_mask || 0;
+
+      document.getElementById('valSpeed').textContent = meta.processing_speed_fps || 0;
+      document.getElementById('valTime').textContent = meta.processing_time_seconds || 0;
+
+      resultVideo.src = data.stream_url;
+      resultVideo.load();
+      resultVideo.play().catch(() => {});
+
+      btnDownload.href = data.download_url;
+    }
+  </script>
+</body>
+</html>

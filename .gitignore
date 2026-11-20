@@ -1,0 +1,47 @@
+# Environment and Secrets (DO NOT COMMIT)
+.env
+.env.*
+!.env.example
+
+# Temporary media files (Keep sample frame and .gitkeep)
+uploads/*.mp4
+uploads/*.avi
+uploads/*.mov
+uploads/*.mkv
+uploads/*.jpg
+uploads/*.png
+!uploads/.gitkeep
+
+outputs/*.mp4
+outputs/*.avi
+outputs/*.mov
+outputs/*.mkv
+!outputs/.gitkeep
+!outputs/sample_frame_37.jpg
+
+# Duplicate model files in root (already preserved in models/ directory)
+yolov8n.pt
+yolov8n-pose.pt
+
+# Python Caches & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+
+# Testing & Logs
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# IDE & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
